@@ -19,19 +19,19 @@ This is a Next.js project that provides personalized music suggestions based on 
 
 2. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
 
-# NextAuth configuration
+### NextAuth configuration
 NEXTAUTH_SECRET=your_nextauth_secret
 NEXTAUTH_URL=http://localhost:3000
 
-# Spotify API credentials
+### Spotify API credentials
 SPOTIFY_CLIENT_ID=your_spotify_client_id
 SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
 
-# OpenAI API key
+### OpenAI API key
 OPENAI_API_KEY=your_openai_api_key
 
-# Note: Make sure to add http://localhost:3000/api/auth/callback/spotify
-# as a Redirect URI in your Spotify Developer Dashboard
+ Note: Make sure to add http://localhost:3000/api/auth/callback/spotify
+ as a Redirect URI in your Spotify Developer Dashboard
 
 ## Features
 
