@@ -1,4 +1,4 @@
-# Music Suggestion App
+## AI Music Suggestion 
 
 Get personalized music suggestions based on the user's mood, weather, location, and preferred genre using Spotify.
 
