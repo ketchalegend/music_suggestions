@@ -51,3 +51,12 @@ OPENAI_API_KEY=your_openai_api_key
 Deploy your app using the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
 
 Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## License
+
+This project is licensed under the MIT License.
+
+## Made By
+
+Made by Ketchalegend with love from Cologne, Germany.  
+Visit my website: [ketchalegend.me](https://ketchalegend.me)
