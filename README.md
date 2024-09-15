@@ -6,6 +6,8 @@ This is a Next.js project that provides personalized music suggestions based on 
 
 1. **Run the development server:**
    ```bash
+   npm install
+   #
    npm run dev
    # or
    yarn dev
