@@ -167,6 +167,17 @@ export default function Home() {
     { icon: "🚗", label: "Commuting" },
   ];
 
+  const GENRES = [
+    "Pop",
+    "R&B",
+    "Jazz",
+    "Afro Beats",
+    "Hip Hop",
+    "Country",
+    "Love",
+    "Classical",
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 text-primary-foreground p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
@@ -256,14 +267,7 @@ export default function Home() {
                       Preferred Genre
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {[
-                        "Pop",
-                        "R&B",
-                        "Jazz",
-                        "Afro Beats",
-                        "Hip Hop",
-                        "Country",
-                      ].map((g) => (
+                      {GENRES.map((g) => (
                         <Button
                           key={g}
                           variant={genre === g ? "secondary" : "outline"}

@@ -16,6 +16,7 @@ Get personalized music suggestions based on your mood, weather, location, and pr
 - **Playlist Creation**: Create custom playlists with your favorite suggested tracks.
 - **Share Suggestions**: Share your music discoveries on social media.
 - **Responsive Design**: Enjoy a seamless experience on both desktop and mobile devices.
+- **No Repeat Suggestions**: The app now remembers previously suggested songs and avoids repeating them, ensuring a fresh experience every time.
 
 ## Setup
 
@@ -37,14 +38,23 @@ Get personalized music suggestions based on your mood, weather, location, and pr
    SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
    NEXTAUTH_SECRET=your_nextauth_secret
    OPENAI_API_KEY=your_openai_api_key
+   KV_URL=your_vercel_kv_url
+   KV_REST_API_URL=your_vercel_kv_rest_api_url
+   KV_REST_API_TOKEN=your_vercel_kv_rest_api_token
+   KV_REST_API_READ_ONLY_TOKEN=your_vercel_kv_rest_api_read_only_token
    ```
 
-4. Run the development server:
+4. Set up Vercel KV:
+   - If you're using Vercel for deployment, you need to set up Vercel KV for persistent storage of previously suggested songs.
+   - Follow the [Vercel KV documentation](https://vercel.com/docs/storage/vercel-kv) to create a new KV database.
+   - After setting up, you'll receive the necessary environment variables (KV_URL, KV_REST_API_URL, KV_REST_API_TOKEN, KV_REST_API_READ_ONLY_TOKEN). Add these to your `.env.local` file and to your Vercel project settings.
+
+5. Run the development server:
    ```
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+6. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ## Technologies Used
 
@@ -55,6 +65,7 @@ Get personalized music suggestions based on your mood, weather, location, and pr
 - NextAuth.js
 - Spotify Web API
 - OpenAI API
+- Vercel KV
 
 ## Contributing
 
