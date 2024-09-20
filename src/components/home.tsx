@@ -4,13 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Loader2,
@@ -40,7 +34,7 @@ interface Playlist {
   name: string;
 }
 
-export default function Home() {
+export function HomeComponent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [weather, setWeather] = useState("");
@@ -131,7 +125,7 @@ export default function Home() {
         fetchPlaylists();
       } else {
         setPlaylistCreationStatus(
-          "Failed to add tracks to playlist. Please try again."
+          "Failed to add tracks playlist. Please try again."
         );
       }
     } catch (error) {
@@ -168,13 +162,14 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20 text-primary-foreground p-4 sm:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl sm:text-5xl font-bold text-center mb-8 sm:mb-12">
           VibeFlow
         </h1>
-        <p className="text-sm sm:text-xl text-center mb-8 sm:mb-12">
-          Discover music that matches your mood and vibe 🎶 🎧
+        <p className="text-lg sm:text-xl text-center mb-8 sm:mb-12">
+          Discover music that matches your mood and vibe. Explore personalized
+          playlists crafted just for you.
         </p>
 
         <Tabs defaultValue="vibe" className="mb-8">
@@ -364,7 +359,7 @@ export default function Home() {
                 {selectedTracks.map((track) => (
                   <div
                     key={track.trackId}
-                    className="flex justify-between items-center bg-secondary rounded-lg p-2"
+                    className="flex justify-between items-center bg-neutral-100 rounded-lg p-2 dark:bg-neutral-800"
                   >
                     <span className="truncate">
                       {track.name} - {track.artist}
@@ -383,18 +378,17 @@ export default function Home() {
                 value={selectedPlaylist || ""}
                 onValueChange={(value) => setSelectedPlaylist(value)}
               >
-                <SelectTrigger className="w-full mb-4">
-                  <SelectValue placeholder="Select a playlist" />
-                </SelectTrigger>
-                <SelectContent>
-                  {playlists
-                    .filter((playlist) => playlist.id) // Filter out any playlists with empty or undefined IDs
-                    .map((playlist) => (
-                      <SelectItem key={playlist.id} value={playlist.id}>
-                        {playlist.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
+                <Select.Trigger className="w-full mb-4">
+                  <Select.Value placeholder="Select a playlist" />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="">Create New Playlist</Select.Item>
+                  {playlists.map((playlist) => (
+                    <Select.Item key={playlist.id} value={playlist.id}>
+                      {playlist.name}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
               </Select>
               <Button onClick={handleCreatePlaylist} className="w-full">
                 <Music className="mr-2 h-4 w-4" />
@@ -408,7 +402,7 @@ export default function Home() {
         )}
 
         {playlistCreationStatus && (
-          <div className="text-xl font-semibold text-center bg-secondary rounded-xl p-4 mb-8 animate-pulse">
+          <div className="text-xl font-semibold text-center bg-neutral-100 rounded-xl p-4 mb-8 animate-pulse dark:bg-neutral-800">
             {playlistCreationStatus}
           </div>
         )}

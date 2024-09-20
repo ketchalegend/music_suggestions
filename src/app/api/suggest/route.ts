@@ -14,6 +14,7 @@ const spotifyApi = new SpotifyWebApi({
 });
 
 interface SpotifyTrack {
+  id: string;
   name: string;
   artists: { name: string }[];
   album: {
@@ -31,7 +32,7 @@ async function searchSpotifyTracks(
   accessToken: string
 ): Promise<SpotifyTrack[]> {
   spotifyApi.setAccessToken(accessToken);
-  const results = await spotifyApi.searchTracks(query, { limit: 5 });
+  const results = await spotifyApi.searchTracks(query, { limit: 10 });
   return results.body.tracks?.items || [];
 }
 
@@ -58,11 +59,11 @@ export async function POST(req: Request) {
         {
           role: "system",
           content:
-            "You are a music recommendation expert. Based on the user's input and their music preferences, suggest a song that fits their current situation and taste. You will use the provided function to search for songs on Spotify.",
+            "You are a music recommendation expert. Based on the user's input and their music preferences, suggest 3 songs that fit their current situation and taste. You will use the provided function to search for songs on Spotify.",
         },
         {
           role: "user",
-          content: `Suggest a song based on the following:
+          content: `Suggest 3 songs based on the following:
           Weather: ${weather}
           Mood: ${mood}
           Location: ${location}
@@ -106,7 +107,7 @@ export async function POST(req: Request) {
 
         // Filter out previously suggested tracks
         const newTracks = tracks.filter(
-          (track) => !previousSuggestions.has(track.name)
+          (track) => !previousSuggestions.has(track.id)
         );
 
         if (newTracks.length === 0) {
@@ -116,32 +117,34 @@ export async function POST(req: Request) {
           );
         }
 
-        const track = newTracks[0]; // Select the first new track from the results
+        // Select up to 3 new tracks from the results
+        const selectedTracks = newTracks.slice(0, 3);
 
-        // Add the new track to the list of previous suggestions
-        previousSuggestions.add(track.name);
+        // Add the new tracks to the list of previous suggestions
+        selectedTracks.forEach((track) => previousSuggestions.add(track.id));
 
-        const suggestion = {
+        const suggestions = selectedTracks.map((track) => ({
+          trackId: track.id,
           name: track.name,
           artist: track.artists[0].name,
           album: track.album.name,
           albumImageUrl: track.album.images[0]?.url,
           previewUrl: track.preview_url,
           spotifyUrl: track.external_urls.spotify,
-        };
+        }));
 
-        return NextResponse.json({ suggestion });
+        return NextResponse.json({ suggestions });
       }
     }
 
     return NextResponse.json(
-      { error: "Failed to generate a suggestion" },
+      { error: "Failed to generate suggestions" },
       { status: 500 }
     );
   } catch (error) {
     console.error("Error in music suggestion:", error);
     return NextResponse.json(
-      { error: "Failed to generate music suggestion" },
+      { error: "Failed to generate music suggestions" },
       { status: 500 }
     );
   }
