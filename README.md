@@ -21,7 +21,7 @@ Get personalized music suggestions based on your mood, weather, location, and pr
 
 1. Clone the repository:
    ```
-   git clone https://github.com/your-username/musicsuggestion.git
+   git clone https://github.com/ketchalegend/music_suggestions.git
    cd musicsuggestion
    ```
 
