@@ -13,7 +13,43 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Music2Icon } from "lucide-react";
+import Image from "next/image";
 
+// Array of artist image URLs (replace with actual URLs)
+const artistImages = [
+  "https://imgs.search.brave.com/EzoSkB6VX8eIXjX838r9yjk52lIS71baZZ9VgqyNxSk/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9zMS50/aWNrZXRtLm5ldC9k/YW0vYS8xM2YvNDVj/YjU2OTEtNTdjYi00/MjdjLWJkNjgtZWU4/Yjg4YWYzMTNmX1JF/VElOQV9QT1JUUkFJ/VF8zXzIuanBn",
+  "https://imgs.search.brave.com/LUCof02gS92VvC1p4iemXaW2WG2hip0UWm1hR74IYYg/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/YmlsbGJvYXJkLmNv/bS93cC1jb250ZW50/L3VwbG9hZHMvMjAy/NC8wOC9RaW5nLU1h/ZGktcHJlc3MtY3Jl/ZGl0LVNpbWR5LUNo/dWt3dW1hLTIwMjQt/YmlsbGJvYXJkLTE1/NDguanBnP3c9OTQy/Jmg9NjIzJmNyb3A9/MQ",
+  "https://imgs.search.brave.com/-UmbbONikD33Gozbe76SQ8NmKu9G4KFkZh7yxNUKVUQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJjYXZlLmNv/bS93cC93cDQ0ODU5/MzAuanBn",
+  "https://imgs.search.brave.com/dxLmh36yD6ZxmtpzWONsFuKqPlFuIg3rfbqkkGhFED0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnl0/aW1nLmNvbS92aS9k/TnQxUVIxZWN1TS9t/YXhyZXNkZWZhdWx0/LmpwZw",
+  "https://imgs.search.brave.com/dWjQDfCUgxJNI2-90lbfj5tkhgdavJ5B-QncdfbBiIY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZS5nYWxhLmRlLzIy/NjAwNjI4L3QvY3Iv/djEzL3c0ODAvcjEv/LS9iZXlvbmNlLWtu/b3dsZXMuanBn",
+  "https://imgs.search.brave.com/FtxDngzLQNr3OS86HDHOP_a0FUWV-10oOFQLniMz_3M/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTQ2/MzI1MDAxNC9waG90/by9sb3MtYW5nZWxl/cy1jYWxpZm9ybmlh/LXRheWxvci1zd2lm/dC1hdHRlbmRzLXRo/ZS02NXRoLWdyYW1t/eS1hd2FyZHMtb24t/ZmVicnVhcnktMDUt/MjAyMy1pbi1sb3Mu/anBnP3M9NjEyeDYx/MiZ3PTAmaz0yMCZj/PWFIdHJEMU1FTE1y/SnpCd3ZYVmRhX1RI/UDBWRFpVV3Y2eGFn/X0dOV3NPQ2s9",
+  "https://imgs.search.brave.com/GPMyrTZ-fOBEHscg18u67Mcw9kbIU89Y-mBZF-qEF6o/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS1jbGRucnkucy1u/YmNuZXdzLmNvbS9p/bWFnZS91cGxvYWQv/dF9maXQtNTYwdyxm/X2F1dG8scV9hdXRv/OmJlc3Qvcm9ja2Nt/cy8yMDIyLTA4LzIy/MDgwMi1jaHJpcy1i/cm93bi1qbS0xMzAx/LWMyMWQ0Ny5qcGc",
+  "https://imgs.search.brave.com/76RGNfr_pmXgx9RW59vEQiJ_8XWxwIzDLCXzAqx3aso/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pY2hl/Zi5iYmNpLmNvLnVr/L25ld3MvNDgwL2Nw/c3Byb2RwYi81NDNF/L3Byb2R1Y3Rpb24v/XzEyNzQ2NjUxMl9n/ZXR0eWltYWdlcy0x/NDE0NTczMjEyXzk3/Ni5wbmcud2VicA",
+  "https://imgs.search.brave.com/Axtp_1it2Aog8FdREdexA6DX4vsq5lhyqSeI4BqnqTQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9yb3Zp/bXVzaWMucm92aWNv/cnAuY29tL2ltYWdl/LmpwZz9jPWl5dGNl/NDRjTzVXcGhRV05X/WmJWdTlfTTY5X1VJ/OXJySlNWdldMMi15/QWc9JmY9NA",
+  "https://imgs.search.brave.com/Gj15MpEVcjftlT5QXhUbICdgHBpgfK8e4towHjPdpm8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy9l/L2U5L09tYWhfTGF5/X3BlcmZvcm1pbmdf/aW5fMjAyMy5qcGc",
+  "https://imgs.search.brave.com/WS45MGRmyAiB07csp9mZgqtTHilD1I8VY-uWu1EjCP8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pMC53/cC5jb20vd3d3LmJp/b2dyYXBoeXdlYi5v/cmcvd3AtY29udGVu/dC91cGxvYWRzLzIw/MjIvMDkvVGVtcy1i/aW9ncmFwaHkuanBn/P3Jlc2l6ZT02OTQs/NDU1JnNzbD0x",
+  "https://imgs.search.brave.com/sAbUbE1dXhO-DdAXnRkIb9A78D-LHpzJ6IWxWGD-UZA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sYXN0/Zm0uZnJlZXRscy5m/YXN0bHkubmV0L2kv/dS8zMDB4MzAwLzA5/MThiOGUyYzgxMjFk/OWU0MjA0MGFhZmRm/YzA2MGQwLmpwZw",
+  "https://imgs.search.brave.com/zVEFrplq_S8FhHq9IUV8CgJzzvGs_rs1MXMQSR37HLI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5waXRjaGZvcmsu/Y29tL3Bob3Rvcy82/MzQ3MDIwMTA0ZTg4/NzViNDEwMzY0N2Mv/MTY6OS93XzgwMCxo/XzQ1MCxjX2xpbWl0/L3N0b3JtenkuSlBH",
+  "https://imgs.search.brave.com/0dIOB4GWpwh_sEUHhHSTQWRKacjqsToGJZhzJCCAMUc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly94dHRy/YXdhdmUuY29tL3dw/LWNvbnRlbnQvdXBs/b2Fkcy8yMDIxLzA2/L1RvcC0xMC1CZXN0/LVVLLXJhcHBlcnMt/dG8td2F0Y2gtb3V0/LWZvci1pbi0yMDIx/LTEuanBn",
+  "https://imgs.search.brave.com/ulJQt-NXZjAKN6O9NbF112F6zHakGabsmBlj_ro1YmY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/ZGF0b2Ntcy1hc3Nl/dHMuY29tLzE3NzQ2/LzE2ODk3ODg1MDYt/am9yZHktdWstcmFw/cGVycy5qcGc",
+  "https://imgs.search.brave.com/EHUr0ywWWd2YEGJa8RJ6qih82138_pGCKWZZzaxHmps/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/ZGF0b2Ntcy1hc3Nl/dHMuY29tLzE3NzQ2/LzE2ODk3ODY3OTgt/c3RlcHotdWstcmFw/cGVycy5qcGc",
+  "https://imgs.search.brave.com/8SRhY1dU35ApUtKrow1CC8z9vMbbwoGxpUKwnUKwYQw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tdXNp/Y3NzdGFyLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMy8w/NC9KYXkxLmpwZw",
+  "https://imgs.search.brave.com/skXGfvCqRSHq--OwE2dM0X8cEaIq3T46FNLerRn7xmc/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sZWRn/ZXJub3RlLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMC8w/NC9qYXktei5qcGc",
+  "https://imgs.search.brave.com/piSjn4dgLdOCeT0LYKTJvi79iIyIOrsKEF0MZprzWnA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sZWRn/ZXJub3RlLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMi8w/NS9kcmFrZS1lMTY3/OTY2MTkzODk5MC53/ZWJw",
+  "https://imgs.search.brave.com/XdPqkm46tvKaY-2cPQIq9oWQetZAB_7xTFXwR0PsPvk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sZWRn/ZXJub3RlLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMC8w/NC9saWwtd2F5bmUu/anBn",
+  "https://imgs.search.brave.com/gDJFfc10u4gobkomlKbF_fDFLL_jz9mvf5hXzrYstKo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sZWRn/ZXJub3RlLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMC8w/NC9rZW5kcmljay1s/YW1hci5qcGc",
+  "https://imgs.search.brave.com/yCp7k4O619wJdd7ePL8g7I8CKPEHR-QTSMCRoE2Ydnw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sZWRn/ZXJub3RlLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMy8w/My9Tbm9vcC1Eb2dn/LUNyb3BwZWQtU21h/bGwuanBn",
+
+  // Add more image URLs as needed
+];
+
+const styles = `
+  @keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+  }
+`;
 export default function Login() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -29,8 +65,47 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">
+      <style>{styles}</style>
+      {/* Artist images background */}
+      <div className="absolute inset-0 z-0">
+        {artistImages.map((src, index) => {
+          const size = ["w-12 h-12", "w-16 h-16", "w-20 h-20", "w-24 h-24"][
+            index % 4
+          ];
+          const shape = index % 2 === 0 ? "rounded-full" : "rounded-lg";
+          return (
+            <div
+              key={index}
+              className="absolute"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                transform: `translate(-50%, -50%) rotate(${
+                  Math.random() * 360
+                }deg)`,
+                animation: `float ${
+                  Math.random() * 2 + 2
+                }s ease-in-out infinite`,
+              }}
+            >
+              <div
+                className={`${shape} ${size} overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:scale-110 hover:z-10`}
+              >
+                <Image
+                  src={src}
+                  alt={`Artist ${index + 1}`}
+                  layout="fill"
+                  objectFit="cover"
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Login card */}
+      <Card className="w-full max-w-md relative z-20 bg-white/80 backdrop-blur-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl sm:text-3xl font-bold">
             VibeFlow
@@ -41,7 +116,7 @@ export default function Login() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex justify-center">
-            <Music2Icon className="h-16 w-16 sm:h-24 sm:w-24 text-primary" />
+            <Music2Icon className="h-16 w-16 sm:h-24 sm:w-24 text-primary animate-pulse" />
           </div>
           <Button
             onClick={handleLogin}

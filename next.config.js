@@ -12,6 +12,9 @@ const nextConfig = {
     }
     return config;
   },
+  images: {
+    domains: ['imgs.search.brave.com'], // Add external domains here
+  },
 };
 
 module.exports = nextConfig;
