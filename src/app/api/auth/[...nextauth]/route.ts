@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           scope:
-            "user-read-email user-top-read user-read-recently-played user-read-private playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-follow-read",
+            "user-read-email user-top-read user-read-recently-played user-read-private playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-follow-read user-read-currently-playing",
         },
       },
     }),

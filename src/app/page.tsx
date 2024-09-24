@@ -22,6 +22,12 @@ import {
   Snowflake,
   CloudSun,
   CloudRain,
+  Clock,
+  Disc3,
+  Mic2,
+  Music2,
+  PlayCircle,
+  BarChart2
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -40,6 +46,35 @@ interface Playlist {
   name: string;
 }
 
+interface SpotifyStats {
+  topArtists: {
+    name: string;
+    playCount: number;
+    image: string;
+    genres: string[];
+  }[];
+  topTracks: {
+    name: string;
+    artist: string;
+    playCount: number;
+    image: string;
+    album: string;
+  }[];
+  totalListeningTime: number;
+  favoriteGenres: { name: string; count: number }[];
+  nowPlaying: {
+    name: string;
+    artist: string;
+    album: string;
+    image: string;
+  } | null;
+  timeRange: string;
+  timeRangeText: string;
+  recentTracksCount: number;
+  audioFeatures: { [key: string]: number };
+  uniqueArtistsCount: number;
+}
+
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -55,6 +90,9 @@ export default function Home() {
   >(null);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
+  const [spotifyStats, setSpotifyStats] = useState<SpotifyStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+  const [timeRange, setTimeRange] = useState<string>("medium_term");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -65,8 +103,9 @@ export default function Home() {
   useEffect(() => {
     if (session) {
       fetchPlaylists();
+      fetchSpotifyStats(timeRange);
     }
-  }, [session]);
+  }, [session, timeRange]);
 
   const fetchPlaylists = async () => {
     try {
@@ -76,6 +115,18 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching playlists:", error);
     }
+  };
+
+  const fetchSpotifyStats = async (selectedTimeRange: string) => {
+    setIsLoadingStats(true);
+    try {
+      const response = await fetch(`/api/get-spotify-stats?timeRange=${selectedTimeRange}`);
+      const data = await response.json();
+      setSpotifyStats(data);
+    } catch (error) {
+      console.error("Error fetching Spotify stats:", error);
+    }
+    setIsLoadingStats(false);
   };
 
   const handleSubmit = async () => {
@@ -189,9 +240,10 @@ export default function Home() {
         </p>
 
         <Tabs defaultValue="vibe" className="mb-8">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="vibe">Current Vibe</TabsTrigger>
             <TabsTrigger value="setting">Your Setting</TabsTrigger>
+            <TabsTrigger value="stats">Spotify Stats</TabsTrigger>
           </TabsList>
           <TabsContent value="vibe">
             <Card>
@@ -280,6 +332,251 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="stats" className="space-y-8">
+            <Card className="bg-gradient-to-br from-purple-900 to-indigo-900">
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-3xl font-bold text-white">
+                    Your Spotify Insights
+                  </CardTitle>
+                  <Select value={timeRange} onValueChange={setTimeRange}>
+                    <SelectTrigger className="w-[180px] bg-white/10 text-white border-none">
+                      <SelectValue placeholder="Select time range" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="short_term">Last 4 Weeks</SelectItem>
+                      <SelectItem value="medium_term">Last 6 Months</SelectItem>
+                      <SelectItem value="long_term">All Time</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {spotifyStats && (
+                  <p className="text-sm text-gray-300">
+                    Unveiling your musical journey from{" "}
+                    {spotifyStats.timeRangeText}
+                  </p>
+                )}
+              </CardHeader>
+              <CardContent>
+                {isLoadingStats ? (
+                  <div className="flex justify-center items-center h-64">
+                    <Loader2 className="h-12 w-12 animate-spin text-white" />
+                  </div>
+                ) : spotifyStats ? (
+                  <div className="space-y-8">
+                    {spotifyStats.nowPlaying && (
+                      <Card className="bg-white/10 backdrop-blur-lg">
+                        <CardContent className="p-6">
+                          <h3 className="text-2xl font-semibold mb-4 flex items-center text-white">
+                            <PlayCircle className="mr-2 text-green-400" /> Now
+                            Playing
+                          </h3>
+                          <div className="flex items-center space-x-4">
+                            <img
+                              src={spotifyStats.nowPlaying.image}
+                              alt={spotifyStats.nowPlaying.album}
+                              className="w-24 h-24 rounded-md object-cover shadow-lg"
+                            />
+                            <div>
+                              <p className="font-semibold text-xl text-white">
+                                {spotifyStats.nowPlaying.name}
+                              </p>
+                              <p className="text-gray-300">
+                                {spotifyStats.nowPlaying.artist}
+                              </p>
+                              <p className="text-sm text-gray-400">
+                                {spotifyStats.nowPlaying.album}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <Card className="bg-white/5 backdrop-blur-sm">
+                        <CardContent className="p-6">
+                          <h3 className="text-2xl font-semibold mb-4 flex items-center text-white">
+                            <Mic2 className="mr-2 text-pink-400" /> Top Artists
+                          </h3>
+                          <div className="space-y-4">
+                            {spotifyStats.topArtists &&
+                              spotifyStats.topArtists.map((artist, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center space-x-4 group"
+                                >
+                                  <img
+                                    src={artist.image}
+                                    alt={artist.name}
+                                    className="w-16 h-16 rounded-full object-cover shadow-md group-hover:scale-105 transition-transform"
+                                  />
+                                  <div>
+                                    <p className="font-semibold text-white group-hover:text-pink-400 transition-colors">
+                                      {artist.name}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      {artist.playCount} plays
+                                    </p>
+                                    <p className="text-xs text-gray-400">
+                                      {artist.genres.slice(0, 3).join(", ")}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-white/5 backdrop-blur-sm">
+                        <CardContent className="p-6">
+                          <h3 className="text-2xl font-semibold mb-4 flex items-center text-white">
+                            <Music2 className="mr-2 text-blue-400" /> Top Tracks
+                          </h3>
+                          <div className="space-y-4">
+                            {spotifyStats.topTracks &&
+                              spotifyStats.topTracks.map((track, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center space-x-4 group"
+                                >
+                                  <img
+                                    src={track.image}
+                                    alt={track.album}
+                                    className="w-16 h-16 rounded-md object-cover shadow-md group-hover:scale-105 transition-transform"
+                                  />
+                                  <div>
+                                    <p className="font-semibold text-white group-hover:text-blue-400 transition-colors">
+                                      {track.name}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                      {track.artist}
+                                    </p>
+                                    <p className="text-xs text-gray-400">
+                                      {track.playCount} plays
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <Card className="bg-white/5 backdrop-blur-sm">
+                        <CardContent className="p-6">
+                          <h3 className="text-2xl font-semibold mb-4 flex items-center text-white">
+                            <Clock className="mr-2 text-yellow-400" /> Listening
+                            Snapshot
+                          </h3>
+                          <div className="grid grid-cols-2 gap-4 text-center">
+                            <div className="bg-white/10 rounded-lg p-4">
+                              <p className="text-4xl font-bold text-yellow-400">
+                                {Math.round(
+                                  spotifyStats.totalListeningTime / 3600000
+                                )}
+                              </p>
+                              <p className="text-gray-300">hours of music</p>
+                            </div>
+                            <div className="bg-white/10 rounded-lg p-4">
+                              <p className="text-4xl font-bold text-yellow-400">
+                                {spotifyStats.recentTracksCount}
+                              </p>
+                              <p className="text-gray-300">
+                                tracks in last session
+                              </p>
+                            </div>
+                            <div className="bg-white/10 rounded-lg p-4 col-span-2">
+                              <p className="text-2xl font-bold text-yellow-400">
+                                {spotifyStats.uniqueArtistsCount}
+                              </p>
+                              <p className="text-gray-300">
+                                unique artists explored
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-white/5 backdrop-blur-sm">
+                        <CardContent className="p-6">
+                          <h3 className="text-2xl font-semibold mb-4 flex items-center text-white">
+                            <Disc3 className="mr-2 text-green-400" /> Genre
+                            Palette
+                          </h3>
+                          <div className="space-y-2">
+                            {spotifyStats.favoriteGenres &&
+                              spotifyStats.favoriteGenres.map(
+                                (genre, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center space-x-2"
+                                  >
+                                    <div className="w-full bg-white/20 rounded-full h-4">
+                                      <div
+                                        className="bg-green-400 h-4 rounded-full"
+                                        style={{
+                                          width: `${
+                                            (genre.count /
+                                              spotifyStats.favoriteGenres[0]
+                                                .count) *
+                                            100
+                                          }%`,
+                                        }}
+                                      ></div>
+                                    </div>
+                                    <span className="text-sm text-white min-w-[100px]">
+                                      {genre.name}
+                                    </span>
+                                  </div>
+                                )
+                              )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                    <Card className="bg-white/5 backdrop-blur-sm">
+                      <CardContent className="p-6">
+                        <h3 className="text-2xl font-semibold mb-4 flex items-center text-white">
+                          <BarChart2 className="mr-2 text-purple-400" /> Musical
+                          Mood Board
+                        </h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                          {spotifyStats.audioFeatures &&
+                            Object.entries(spotifyStats.audioFeatures).map(
+                              ([feature, value]) => (
+                                <div key={feature} className="text-center">
+                                  <div
+                                    className="radial-progress text-purple-400"
+                                    style={{ "--value": value * 100 } as React.CSSProperties}
+                                    role="progressbar"
+                                  >
+                                    {Math.round(value * 100)}%
+                                  </div>
+                                  <p className="mt-2 text-sm text-gray-300 capitalize">
+                                    {feature.replace(/_/g, " ")}
+                                  </p>
+                                </div>
+                              )
+                            )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                ) : (
+                  <div className="text-center text-white">
+                    <p className="mb-4">
+                      Oops! We couldn't tune into your Spotify stats right now.
+                      Let's try again?
+                    </p>
+                    <Button
+                      onClick={() => fetchSpotifyStats(timeRange)}
+                      variant="secondary"
+                    >
+                      Retry
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -392,7 +689,7 @@ export default function Home() {
                 </SelectTrigger>
                 <SelectContent>
                   {playlists
-                    .filter((playlist) => playlist.id) // Filter out any playlists with empty or undefined IDs
+                    .filter((playlist) => playlist.id)
                     .map((playlist) => (
                       <SelectItem key={playlist.id} value={playlist.id}>
                         {playlist.name}
